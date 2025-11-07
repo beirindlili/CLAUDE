@@ -42,6 +42,47 @@ DEFAULT_KEYWORDS = [
 ]
 
 
+def select_category_interactive() -> str:
+    """
+    Interactive category selection menu
+
+    Returns:
+        Selected category code
+    """
+    print("\n" + "=" * 60)
+    print("📂 네이버 쇼핑 카테고리 선택")
+    print("=" * 60)
+
+    categories = list(CATEGORY_PRESETS.items())
+
+    for idx, (code, name) in enumerate(categories, 1):
+        print(f"  {idx}. {name} ({code})")
+
+    print(f"  0. 카테고리 없이 진행")
+    print("=" * 60)
+
+    while True:
+        try:
+            choice = input("\n선택 (번호 입력): ").strip()
+
+            if choice == '0':
+                return None
+
+            choice_num = int(choice)
+            if 1 <= choice_num <= len(categories):
+                selected_code = categories[choice_num - 1][0]
+                selected_name = categories[choice_num - 1][1]
+                print(f"✓ 선택됨: {selected_name} ({selected_code})")
+                return selected_code
+            else:
+                print(f"⚠️  1~{len(categories)} 사이의 숫자를 입력하세요")
+        except ValueError:
+            print("⚠️  숫자를 입력하세요")
+        except KeyboardInterrupt:
+            print("\n\n❌ 취소됨")
+            sys.exit(0)
+
+
 def load_seed_keywords(seed_file: str = None) -> List[str]:
     """
     Load seed keywords from file or use defaults
@@ -153,6 +194,8 @@ def main():
 
     parser.add_argument('--category', type=str, default=None,
                        help='Shopping category code (e.g., 50000000)')
+    parser.add_argument('--interactive', '-i', action='store_true',
+                       help='Interactive mode (select category from menu)')
     parser.add_argument('--period', type=int, default=7,
                        help='Analysis period in days (default: 7)')
     parser.add_argument('--top-n', type=int, default=50,
@@ -167,6 +210,10 @@ def main():
                        help='Output directory (default: ./out)')
 
     args = parser.parse_args()
+
+    # Interactive category selection
+    if args.interactive or args.category is None:
+        args.category = select_category_interactive()
 
     # Ensure output directory exists
     os.makedirs(args.outdir, exist_ok=True)
