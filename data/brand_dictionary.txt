@@ -1,0 +1,2 @@
+# Additional brand names (one per line)
+# Add your custom brand names here
