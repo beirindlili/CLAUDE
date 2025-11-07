@@ -249,7 +249,20 @@ def main():
         sys.exit(1)
 
     # Load keywords
-    keywords = load_seed_keywords(args.seed_file)
+    # Priority: 1) seed_file, 2) category keywords, 3) defaults
+    if args.seed_file:
+        keywords = load_seed_keywords(args.seed_file)
+    elif args.category:
+        category_file = f'./data/keywords_{args.category}.txt'
+        if os.path.exists(category_file):
+            print(f"📂 Using category keywords: {category_file}")
+            keywords = load_seed_keywords(category_file)
+        else:
+            print(f"⚠️  Category keywords file not found: {category_file}")
+            print("ℹ️  Using default keywords")
+            keywords = load_seed_keywords(None)
+    else:
+        keywords = load_seed_keywords(None)
 
     if not keywords:
         print("❌ No keywords to analyze")
