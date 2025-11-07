@@ -138,21 +138,26 @@ class DataLabAPI:
         Returns:
             Tuple of (recent_avg, prev_avg, wow)
         """
-        # Get recent period data
-        recent_data = self.get_search_trend(keyword, recent_start, recent_end)
+        try:
+            # Get recent period data
+            recent_data = self.get_search_trend(keyword, recent_start, recent_end)
 
-        # Get previous period data
-        prev_data = self.get_search_trend(keyword, prev_start, prev_end)
+            # Get previous period data
+            prev_data = self.get_search_trend(keyword, prev_start, prev_end)
 
-        # Calculate averages
-        recent_avg = sum(d['ratio'] for d in recent_data) / len(recent_data) if recent_data else 0.0
-        prev_avg = sum(d['ratio'] for d in prev_data) / len(prev_data) if prev_data else 0.0
+            # Calculate averages
+            recent_avg = sum(d['ratio'] for d in recent_data) / len(recent_data) if recent_data else 0.0
+            prev_avg = sum(d['ratio'] for d in prev_data) / len(prev_data) if prev_data else 0.0
 
-        # Calculate week-over-week (or period-over-period) change
-        epsilon = 1.0  # Prevent division by zero
-        wow = (recent_avg - prev_avg) / max(prev_avg, epsilon)
+            # Calculate week-over-week (or period-over-period) change
+            epsilon = 1.0  # Prevent division by zero
+            wow = (recent_avg - prev_avg) / max(prev_avg, epsilon)
 
-        return recent_avg, prev_avg, wow
+            return recent_avg, prev_avg, wow
+        except Exception as e:
+            # DataLab API not available or error occurred
+            # Return zeros to continue without trend data
+            return 0.0, 0.0, 0.0
 
     def get_shopping_keywords(self, category: str, start_date: str, end_date: str,
                              time_unit: str = "date", device: str = "", gender: str = "",
