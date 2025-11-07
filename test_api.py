@@ -81,8 +81,8 @@ headers['Content-Type'] = 'application/json'
 
 from datetime import datetime, timedelta
 today = datetime.now()
-end_date = (today - timedelta(days=1)).strftime('%Y%m%d')
-start_date = (today - timedelta(days=7)).strftime('%Y%m%d')
+end_date = (today - timedelta(days=1)).strftime('%Y-%m-%d')
+start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
 
 body = {
     "startDate": start_date,
