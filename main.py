@@ -206,6 +206,8 @@ def main():
                        help='Path to seed keywords file (.txt or .csv)')
     parser.add_argument('--with-blog', action='store_true',
                        help='Include blog metrics')
+    parser.add_argument('--rising-threshold', type=float, default=0.05,
+                       help='Minimum search growth rate to be considered "rising" (default: 0.05 = 5%%)')
     parser.add_argument('--outdir', type=str, default='./out',
                        help='Output directory (default: ./out)')
 
@@ -221,11 +223,13 @@ def main():
     # Display configuration
     print("=" * 60)
     print("Naver Keyword Opportunity Scraper")
+    print("🎯 Finding rising keywords with low competition")
     print("=" * 60)
     print(f"Category: {args.category or 'N/A'}")
     print(f"Period: {args.period} days")
     print(f"Top N: {args.top_n}")
     print(f"Mode: {args.mode}")
+    print(f"Rising Threshold: {args.rising_threshold:.1%} (search growth)")
     print(f"With Blog: {args.with_blog}")
     print(f"Output: {args.outdir}")
     print("=" * 60)
@@ -294,6 +298,20 @@ def main():
 
     # Calculate scores
     all_results = scorer.calculate_all_scores(all_results, with_blog=args.with_blog)
+
+    # Filter rising keywords
+    threshold = args.rising_threshold
+    print(f"\n📈 Filtering rising keywords (search_wow > {threshold:.1%})...")
+    rising_keywords = [r for r in all_results if r.get('search_wow', 0) > threshold]
+    print(f"  Total keywords: {len(all_results)}")
+    print(f"  Rising keywords: {len(rising_keywords)} ({len(rising_keywords)/len(all_results)*100:.1f}%)")
+
+    # Use rising keywords only
+    if rising_keywords:
+        all_results = rising_keywords
+        print(f"  ✓ Using {len(rising_keywords)} rising keywords")
+    else:
+        print(f"  ⚠️  No keywords meet threshold, using all keywords")
 
     # Classify keywords
     print("\n🏷️  Classifying keywords...")
