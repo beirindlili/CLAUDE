@@ -110,8 +110,8 @@ class DataLabAPI:
             keyword_group["ages"] = ages
 
         request_body = {
-            "startDate": start_date.replace('-', ''),
-            "endDate": end_date.replace('-', ''),
+            "startDate": start_date,
+            "endDate": end_date,
             "timeUnit": time_unit,
             "keywordGroups": [keyword_group]
         }
@@ -178,8 +178,8 @@ class DataLabAPI:
             List of popular keywords
         """
         request_body = {
-            "startDate": start_date.replace('-', ''),
-            "endDate": end_date.replace('-', ''),
+            "startDate": start_date,
+            "endDate": end_date,
             "timeUnit": time_unit,
             "category": [category]
         }
