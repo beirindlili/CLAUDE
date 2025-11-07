@@ -16,6 +16,7 @@ from core.blog_api import BlogAPI
 from core.classify import KeywordClassifier
 from core.scoring import OpportunityScorer
 from core.utils import zscore, save_csv, get_date_ranges
+from core.keyword_extractor import extract_category_keywords
 
 
 # Category presets
@@ -253,23 +254,20 @@ def main():
         sys.exit(1)
 
     # Load keywords
-    # Priority: 1) seed_file, 2) category keywords, 3) defaults
+    # Priority: 1) seed_file, 2) auto-extract from category
     if args.seed_file:
+        print(f"📂 Loading keywords from file: {args.seed_file}")
         keywords = load_seed_keywords(args.seed_file)
     elif args.category:
-        category_file = f'./data/keywords_{args.category}.txt'
-        if os.path.exists(category_file):
-            print(f"📂 Using category keywords: {category_file}")
-            keywords = load_seed_keywords(category_file)
-        else:
-            print(f"⚠️  Category keywords file not found: {category_file}")
-            print("ℹ️  Using default keywords")
-            keywords = load_seed_keywords(None)
+        print(f"🤖 Auto-extracting keywords from category {args.category}...")
+        keywords = extract_category_keywords(args.category, shopping, max_keywords=100)
     else:
-        keywords = load_seed_keywords(None)
+        print("❌ No category or seed file specified")
+        print("   Use --interactive to select category or --seed-file to load keywords")
+        sys.exit(1)
 
     if not keywords:
-        print("❌ No keywords to analyze")
+        print("❌ No keywords found")
         sys.exit(1)
 
     print(f"\n📊 Analyzing {len(keywords)} keywords...")
